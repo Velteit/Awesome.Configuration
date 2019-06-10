@@ -3,8 +3,6 @@ local awful = require("awful")
 local wibox = require("wibox")
 -- Notification library
 local naughty = require("naughty")
-local keys = require("keys")
-local buttons = require("buttons")
 
 local widget = {
     state = 0, 

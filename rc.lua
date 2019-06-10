@@ -10,11 +10,15 @@ beautiful.init(awful.util.getdir("config") .. "themes/zenburn/theme.lua")
 -- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
-local keys = require("keys")
-local buttons = require("buttons")
+local keys = require("keys.global")
 local rules = require("rules")
-local brightess = require("widgets.brightness");
-local battery = require("widgets.battery");
+local widgets = require("widgets");
+local config = require("config");
+config.init({});
+
+-- local brightess = require("widgets.brightness");
+-- local battery = require("widgets.battery");
+
 
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
@@ -77,10 +81,6 @@ awful.layout.layouts = {
     -- awful.layout.suit.corner.sw,
     -- awful.layout.suit.corner.se,
 }
--- }}}
-
--- {{{ Helper functions
-
 -- }}}
 
 -- {{{ Menu
@@ -148,94 +148,14 @@ end
 
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
-index_to_screens = {
-    "eDP1",
-    "HDMI1"
-};
+;
 
-config = {
-    eDP1 = {
-        {
-            index = 1,
-            name = "Web",
-            layout = awful.layout.layouts[2],
-        },
-        {
-            index = 2,
-            name = "Work",
-            layout = awful.layout.layouts[2],
-        },
-        {
-            index = 3,
-            name = "Rider",
-            layout = awful.layout.layouts[2],
-        },
-        {
-            index = 4,
-            name = "Files",
-            layout = awful.layout.layouts[2],
-        },
-        {
-            index = 5,
-            name = "Read",
-            layout = awful.layout.layouts[2],
-        },
-        {
-            index = 6,
-            name = "Temp",
-            layout = awful.layout.layouts[2],
-        },
-    },
-    default = {
-        {
-            index = 1,
-            name = "Web",
-            layout = awful.layout.layouts[2],
-        },
-        {
-            index = 2,
-            name = "Work",
-            layout = awful.layout.layouts[2],
-        },
-        {
-            index = 3,
-            name = "Rider",
-            layout = awful.layout.layouts[2],
-        },
-        {
-            index = 4,
-            name = "Files",
-            layout = awful.layout.layouts[2],
-        },
-        {
-            index = 5,
-            name = "Read",
-            layout = awful.layout.layouts[2],
-        },
-        {
-            index = 6,
-            name = "Temp",
-            layout = awful.layout.layouts[2],
-        },
-    }
-}
-
-separator = wibox.widget {
-   widget = wibox.widget.separator,
-   shape = gears.shape.powerline,
-   color = beautiful.bg_normal,
-   layout = wibox.layout.fixed.horizontal
-}
 
 awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
-    local key = "default";
-    for k,v in pairs(s.outputs) do
-        key = k
-    end;
-
-    local sreen_config = config[key] or config["default"]
+    
+    local sreen_config = config.screens.get_config(s);
     for _, tag in pairs(sreen_config) do
         awful.tag.add(tag.name, {
             layout = tag.layout,
@@ -247,146 +167,20 @@ awful.screen.connect_for_each_screen(function(s)
         });
     end
 
-    -- Each screen has its own tag table.
-    -- awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[2])
-
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
     -- Create an imagebox widget which will contain an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
     s.mylayoutbox = awful.widget.layoutbox(s)
-    s.mylayoutbox:buttons(buttons.layoutbox_buttons)
+    -- s.mylayoutbox:buttons(buttons.layoutbox_buttons)
     -- Create a taglist widget
     -- s.mytaglist = awful.widget.taglist(s, awful.widget.taglist.filter.all, buttons.taglist_buttons)
    
-    s.mytaglist = awful.widget.taglist {
-        screen = s,
-        filter = awful.widget.taglist.filter.all,
-        style   = {
-            shape_border_width = 1,
-            shape = gears.shape.powerline,
-            shape_border_color = beautiful.border_normal,
-        },
-        layout   = {
-            spacing = 0,
-            spacing_widget = {
-                color  = beautiful.border_marked,
-                shape  = gears.shape.powerline,
-                widget = wibox.widget.separator,
-            },
-            layout  = wibox.layout.fixed.horizontal
-        },
-        widget_template = {
-            {
-                {
-                    {
-                        {
-                            {
-                                id     = 'index_role',
-                                widget = wibox.widget.textbox,
-                            },
-                            margins = 2,
-                            widget = wibox.container.margin
-                        },
-                        shape = gears.shape.powerline,
-                        widget = wibox.container.background
-                    },
-                    {
-                        {
-                            id     = 'icon_role',
-                            widget = wibox.widget.imagebox,
-                        },
-                        margins = 1,
-                        widget  = wibox.container.margin,
-                    },
-                    {
-                        id     = 'text_role',
-                        widget = wibox.widget.textbox,
-                    },
-                    margins = 1,
-                    layout = wibox.layout.fixed.horizontal,
-                },
-                left  = 14,
-                right = 14,
-                widget = wibox.container.margin
-            },
-            id     = 'background_role',
-            widget = wibox.container.background,
-            -- Add support for hover colors and an index label
-            create_callback = function(self, c3, index, objects) --luacheck: no unused args
-                self:get_children_by_id('index_role')[1].markup = '<b> '..index..' </b>'
-                self:connect_signal('mouse::enter', function()
-                    if self.bg ~= '#ff0000' then
-                        self.backup     = self.bg
-                        self.has_backup = true
-                    end
-                    self.bg = beautiful.bg_urgent
-                end)
-                self:connect_signal('mouse::leave', function()
-                    if self.has_backup then self.bg = self.backup end
-                end)
-            end,
-            update_callback = function(self, c3, index, objects) --luacheck: no unused args
-                self:get_children_by_id('index_role')[1].markup = '<b> '..index..' </b>'
-            end,
-        },
-        buttons = buttons.taglist_buttons
-    }
-
+    s.mytaglist = widgets.taglist(s);
     -- Create a tasklist widget
     -- s.mytasklist = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, buttons.tasklist_buttons)
 
-    s.mytasklist = awful.widget.tasklist {
-        screen   = s,
-        filter   = awful.widget.tasklist.filter.currenttags,
-        buttons  = buttons.tasklist_buttons,
-        style    = {
-            shape_border_width = 1,
-            shape_border_color = beautiful.border_normal,
-            shape  = gears.shape.powerline,
-        },
-        layout   = {
-            spacing = 0,
-            spacing_widget = {
-                {
-                    color  = beautiful.border_marked,
-                    -- forced_width = 5,
-                    shape        = gears.shape.powerline,
-                    widget       = wibox.widget.separator
-                },
-                valign = 'center',
-                halign = 'center',
-                widget = wibox.container.place,
-            },
-            layout  = wibox.layout.flex.horizontal
-        },
-        -- Notice that there is *NO* wibox.wibox prefix, it is a template,
-        -- not a widget instance.
-        widget_template = {
-            {
-                {
-                    {
-                        {
-                            id     = 'icon_role',
-                            widget = wibox.widget.imagebox,
-                        },
-                        margins = 2,
-                        widget  = wibox.container.margin,
-                    },
-                    {
-                        id     = 'text_role',
-                        widget = wibox.widget.textbox,
-                    },
-                    layout = wibox.layout.fixed.horizontal,
-                },
-                left  = 10,
-                right = 10,
-                widget = wibox.container.margin
-            },
-            id     = 'background_role',
-            widget = wibox.container.background,
-        },
-    }
+    s.mytasklist = widgets.tasklist(s);
     -- Create the wibox
     s.mywibox = awful.wibar({ position = "top", screen = s })
 
@@ -403,9 +197,9 @@ awful.screen.connect_for_each_screen(function(s)
             layout = wibox.layout.fixed.horizontal,
             s.mypromptbox,
             mykeyboardlayout,
-            battery.widget,
-            separator,
-            brightess.widget,
+            widgets.battery.widget,
+            widgets.separator,
+            widgets.brightness.widget,
             wibox.widget.systray(),
             mytextclock,
             s.mylayoutbox,
@@ -422,7 +216,7 @@ root.buttons(gears.table.join(
 
 -- {{{ Key bindings
 -- Set keys
-root.keys(gears.table.join(keys.globalkeys, brightess.keys))
+root.keys(gears.table.join(keys, widgets.brightness.keys))
 -- }}}
 
 -- {{{ Rules
@@ -445,48 +239,6 @@ client.connect_signal("manage", function (c)
     end
 end)
 
--- Add a titlebar if titlebars_enabled is set to true in the rules.
-client.connect_signal("request::titlebars", function(c)
-    -- buttons for the titlebar
-    local buttons = gears.table.join(
-        awful.button({ }, 1, function()
-            client.focus = c
-            c:raise()
-            awful.mouse.client.move(c)
-        end),
-        awful.button({ }, 3, function()
-            client.focus = c
-            c:raise()
-            awful.mouse.client.resize(c)
-        end)
-    )
-
-    awful.titlebar(c) : setup {
-        { -- Left
-            awful.titlebar.widget.iconwidget(c),
-            buttons = buttons,
-            layout  = wibox.layout.fixed.horizontal
-        },
-        { -- Middle
-            { -- Title
-                align  = "center",
-                widget = awful.titlebar.widget.titlewidget(c)
-            },
-            buttons = buttons,
-            layout  = wibox.layout.flex.horizontal
-        },
-        { -- Right
-            awful.titlebar.widget.floatingbutton (c),
-            awful.titlebar.widget.maximizedbutton(c),
-            awful.titlebar.widget.stickybutton   (c),
-            awful.titlebar.widget.ontopbutton    (c),
-            awful.titlebar.widget.closebutton    (c),
-            layout = wibox.layout.fixed.horizontal()
-        },
-        layout = wibox.layout.align.horizontal
-    }
-end)
-
 -- Enable sloppy focus, so that focus follows mouse.
 client.connect_signal("mouse::enter", function(c)
     if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
@@ -503,9 +255,11 @@ client.connect_signal("unfocus", function(c)
     c.border_color = beautiful.border_focus
     c.border_width = beautiful.border_width
 end)
--- }}}
-awful.spawn.with_shell("xrandr --output eDP1 --auto --primary --output HDMI1 --right-of eDP1 --auto")
-awful.spawn.with_shell("setxkbmap -layout \"us,ru\" -option \"grp:caps_toggle\"")
-awful.spawn.with_shell("compton -bCG  --xrender-sync-fence --dbus")
-awful.spawn.with_shell("volumeicon")
-awful.spawn.with_shell("udiskie")
+
+local xresources_name = "awesome.started"
+local xresources = awful.util.pread("xrdb -query")
+if not xresources:match(xresources_name) then
+    awful.util.spawn_with_shell("xrdb -merge <<< " .. "'" .. xresources_name .. ":true'")
+    -- Execute once for X server
+    os.execute("dex --environment Awesome --autostart --search-paths $XDG_CONFIG_HOME/autostart")
+end

@@ -1,7 +1,8 @@
 local awful = require("awful")
 local beautiful = require("beautiful")
-local keys = require("keys")
-local buttons = require("buttons")
+local keys = require("keys.client")
+local buttons = require("buttons.client")
+
 
 local rules = {
     -- All clients will match this rule.
@@ -12,32 +13,20 @@ local rules = {
             border_color = beautiful.border_normal,
             focus = awful.client.focus.filter,
             raise = true,
-            keys = keys.clientkeys,
-            buttons = buttons.clientbuttons,
-            screen = awful.screen.preferred,
-            placement = awful.placement.no_overlap + awful.placement.no_offscreen
+            keys = keys,
+            buttons = buttons,
+            screen = awful.mouse.screen,
+            placement = awful.placement.cetered
         }
     },
     -- Floating clients.
     { 
         rule_any = {
             instance = {
-                "DTA",  -- Firefox addon DownThemAll.
-                "copyq",  -- Includes session name in class.
             },
             class = {
-                "Arandr",
-                "Gpick",
-                "Kruler",
-                "MessageWin",  -- kalarm.
-                "Sxiv",
-                "Wpa_gui",
-                "pinentry",
-                "veromix",
-                "xtightvncviewer"
             },
             name = {
-                "Event Tester",  -- xev.
             },
             role = {
                 "AlarmWindow",  -- Thunderbird's calendar.
