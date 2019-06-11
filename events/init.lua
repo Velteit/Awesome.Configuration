@@ -1,0 +1,15 @@
+local focus = require("events.focus");
+local unfocus = require("events.unfocus");
+local mouse = require("events.mouse");
+local manage = require("events.manage");
+
+local events = {};
+
+function events.init(ctx)
+    focus.init(ctx);
+    unfocus.init(ctx);
+    mouse.init(ctx);
+    manage.init(ctx);
+end
+
+return events;
