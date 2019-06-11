@@ -1,10 +1,11 @@
 local gears = require("gears");
 local awful = require("awful");
+local beautiful = require("beautiful");
 local config = require("config.global");
 local keys = require("rules.global.keys");
 local buttons = require("rules.global.buttons");
 
-return {
+local rule = {
     rule = { },
     properties = {
         border_width = beautiful.border_width,
@@ -14,6 +15,7 @@ return {
         keys = keys,
         buttons = buttons,
         screen = awful.mouse.screen,
-        placement = awful.placement.cetered
+        placement = awful.placement.centered
     }
-};
+}
+return rule;

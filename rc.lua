@@ -1,8 +1,8 @@
 local beautiful = require("beautiful")
+local awful = require("awful")
 beautiful.init(awful.util.getdir("config") .. "themes/zenburn/theme.lua")
 
 local gears = require("gears")
-local awful = require("awful")
 require("awful.autofocus")
 local wibox = require("wibox")
 local naughty = require("naughty")
@@ -11,6 +11,7 @@ local keys = require("keys.global")
 local rules = require("rules")
 local widgets = require("widgets");
 local config = require("config");
+local events = require("events");
 
 local ctx = { client = client, awesome = awesome, root = root, screen = screen };
 
@@ -37,7 +38,7 @@ do
 end
 
 -- TODO move menu to widgets
-editor_cmd = terminal .. " -e " .. config.global.editor
+editor_cmd = config.global.terminal .. " -e " .. config.global.editor
 
 myawesomemenu = {
    { "hotkeys", function() return false, hotkeys_popup.show_help end},

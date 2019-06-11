@@ -22,3 +22,4 @@ local buttons = gears.table.join(
         awful.mouse.client.resize
     )
 );
+return buttons;

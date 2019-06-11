@@ -1,5 +1,5 @@
 local wibox = require("wibox");
-local beatiful = require("gears");
+local beautiful = require("beautiful");
 local gears = require("gears");
 
 return wibox.widget {
