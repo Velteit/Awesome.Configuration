@@ -12,30 +12,14 @@ local rules = require("rules")
 local widgets = require("widgets");
 local config = require("config");
 local events = require("events");
+local autorun = require("autorun");
+
 
 local ctx = { client = client, awesome = awesome, root = root, screen = screen };
 
 config.init(ctx);
+widgets.init(ctx);
 
--- TODO move to events. errors module
-if awesome.startup_errors then
-    naughty.notify({ preset = naughty.config.presets.critical,
-                     title = "Oops, there were errors during startup!",
-                     text = awesome.startup_errors })
-end
-
-do
-    local in_error = false
-    awesome.connect_signal("debug::error", function (err)
-        if in_error then return end
-        in_error = true
-
-        naughty.notify({ preset = naughty.config.presets.critical,
-                         title = "Oops, an error happened!",
-                         text = tostring(err) })
-        in_error = false
-    end)
-end
 
 -- TODO move menu to widgets
 editor_cmd = config.global.terminal .. " -e " .. config.global.editor
@@ -56,9 +40,6 @@ mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesom
 mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon, menu = mymainmenu })
 
 menubar.utils.terminal = config.global.terminal
--- TODO move to widgets
-mykeyboardlayout = awful.widget.keyboardlayout()
-mytextclock = wibox.widget.textclock()
 
 -- TODO move to utils
 local function set_wallpaper(s)
@@ -123,12 +104,12 @@ awful.screen.connect_for_each_screen(function(s)
         {
             layout = wibox.layout.fixed.horizontal,
             s.mypromptbox,
-            mykeyboardlayout,
+            widgets.kbd.widget,
             widgets.battery.widget,
             widgets.separator,
             widgets.brightness.widget,
             wibox.widget.systray(),
-            mytextclock,
+            widgets.clock.widget,
             s.mylayoutbox,
         },
     }
@@ -145,11 +126,4 @@ root.keys(gears.table.join(keys, widgets.brightness.keys))
 awful.rules.rules = rules
 
 events.init(ctx);
-
--- TODO move to autostart module
-local xresources_name = "awesome.started"
-local xresources = awful.util.pread("xrdb -query")
-if not xresources:match(xresources_name) then
-    awful.util.spawn_with_shell("xrdb -merge <<< " .. "'" .. xresources_name .. ":true'")
-    os.execute("dex --environment Awesome --autostart --search-paths $XDG_CONFIG_HOME/autostart")
-end
+autorun.init(ctx);
