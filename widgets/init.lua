@@ -5,6 +5,8 @@ local tasklist = require("widgets.tasklist");
 local separator = require("widgets.separator");
 local kbd = require("widgets.kbd");
 local clock = require("widgets.clock");
+local newsboat = require("widgets.newsboat");
+local volume = require("widgets.volume");
 
 local widgets = { 
     brightness = brightness,
@@ -13,11 +15,14 @@ local widgets = {
     tasklist = tasklist,
     separator = separator,
     kbd = kbd,
-    clock = clock
+    clock = clock,
+    volume = volume,
+--    newsboat = newsboat
 };
 
 function widgets.init(ctx)
     kbd.init(ctx);
+ --   newsboat.init(ctx);
 end
 
 return widgets;

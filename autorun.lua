@@ -6,7 +6,7 @@ local autostart = {};
 
 function autostart.init(ctx)
     gears.timer {
-        timeout = 3,
+        timeout = 1,
         autostart = true,
         single_shot = true,
         callback =

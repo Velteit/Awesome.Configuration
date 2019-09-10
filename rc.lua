@@ -1,11 +1,11 @@
 local beautiful = require("beautiful")
 local awful = require("awful")
-beautiful.init(awful.util.getdir("config") .. "themes/zenburn/theme.lua")
+beautiful.init(awful.util.getdir("config") .. "themes/default/theme.lua")
 
 local gears = require("gears")
 require("awful.autofocus")
 local wibox = require("wibox")
-local naughty = require("naughty")
+naughty = require("naughty")
 local menubar = require("menubar")
 local keys = require("keys.global")
 local rules = require("rules")
@@ -71,6 +71,7 @@ local function set_wallpaper(s)
 end
 --TODO move to events
 screen.connect_signal("property::geometry", set_wallpaper)
+
 awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
@@ -91,7 +92,7 @@ awful.screen.connect_for_each_screen(function(s)
     s.mylayoutbox = awful.widget.layoutbox(s)
     s.mytaglist = widgets.taglist(s);
     s.mytasklist = widgets.tasklist(s);
-    s.mywibox = awful.wibar({ position = "top", screen = s })
+    s.mywibox = awful.wibar({ position = "top", height = 20, screen = s })
 
     s.mywibox:setup {
         layout = wibox.layout.align.horizontal,
@@ -108,6 +109,7 @@ awful.screen.connect_for_each_screen(function(s)
             widgets.battery.widget,
             widgets.separator,
             widgets.brightness.widget,
+            widgets.volume.widget,
             wibox.widget.systray(),
             widgets.clock.widget,
             s.mylayoutbox,
@@ -120,7 +122,7 @@ root.buttons(gears.table.join(
     awful.button({ }, 3, function () mymainmenu:toggle() end)
 ))
 -- TODO move to keys.init
-root.keys(gears.table.join(keys, widgets.brightness.keys))
+root.keys(gears.table.join(keys, widgets.brightness.keys, widgets.volume.keys))
 
 -- TODO move to rules.init
 awful.rules.rules = rules

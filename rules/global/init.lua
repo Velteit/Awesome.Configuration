@@ -14,7 +14,7 @@ local rule = {
         raise = true,
         keys = keys,
         buttons = buttons,
-        screen = awful.mouse.screen,
+        screen = function (c) return awesome.startup and c.screen or awful.screen.focused() end,
         placement = awful.placement.centered
     }
 }
