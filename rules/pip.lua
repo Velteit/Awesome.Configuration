@@ -1,12 +1,12 @@
 local awful = require("awful");
 
 local picture_in_picture = {
-    rule_any = {
-        instance = "Picture in picture"
+    rule = {
+        name = "Picture in picture"
     },
     properties = { 
-        screen = awful.mouse.screen,
-        floating = false
+        floating = true,
+        placement = awful.placement.bottom_right
     }
 };
 

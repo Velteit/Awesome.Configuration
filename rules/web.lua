@@ -5,7 +5,6 @@ local web = {
         class = { "chromium" }
     },
     properties = { 
-        screen = awful.mouse.screen,
         tag = "Web"
     }
 };

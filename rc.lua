@@ -78,6 +78,10 @@ awful.screen.connect_for_each_screen(function(s)
     local sreen_config = config.screens.get_config(s);
 
     for _, tag in pairs(sreen_config) do
+        local command = "tmux new-session -d -c ~/ -s '" .. tag.name .. "'";
+
+        awful.spawn.with_shell(command);
+
         awful.tag.add(tag.name, {
             layout = tag.layout,
             screen = s,

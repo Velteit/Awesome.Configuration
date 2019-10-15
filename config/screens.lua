@@ -9,34 +9,34 @@ local screens = {
         },
         {
             index = 2,
-            name = "Work",
-            layout = layouts[2],
-        },
-        {
-            index = 3,
-            name = "Rider",
-            layout = layouts[2],
-        },
-        {
-            index = 4,
-            name = "Files",
-            layout = layouts[2],
-        },
-        {
-            index = 5,
-            name = "Read",
-            layout = layouts[2],
-        },
-        {
-            index = 6,
             name = "Chats",
             layout = layouts[2],
         },
-        {
-            index = 7,
-            name = "Temp",
-            layout = layouts[2],
-        },
+        -- {
+        --     index = 3,
+        --     name = "Rider",
+        --     layout = layouts[2],
+        -- },
+        -- {
+        --     index = 4,
+        --     name = "Files",
+        --     layout = layouts[2],
+        -- },
+        -- {
+        --     index = 5,
+        --     name = "Read",
+        --     layout = layouts[2],
+        -- },
+        -- {
+        --     index = 6,
+        --     name = "Chats",
+        --     layout = layouts[2],
+        -- },
+        -- {
+        --     index = 7,
+        --     name = "Temp",
+        --     layout = layouts[2],
+        -- },
  
     }
 };

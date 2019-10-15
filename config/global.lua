@@ -1,5 +1,5 @@
 local global = {
-    terminal = "terminator",
+    terminal = "alacritty",
     modkey = "Mod4",
     editor = "vim"
 };
