@@ -217,7 +217,6 @@ local keys = gears.table.join(
             awful.spawn.easy_async_with_shell("echo -e '" .. tags_str .. "' | rofi -dmenu -markup -p 'Tags' -lines " .. #tags .. " -location 2 -sep ';'" ,
                 function(tag_name, err, reason, exit_code)
                     if exit_code == 0 then 
-                        debug.print("debug", tag_name);
                         local tag = tags[tag_name:gsub("\n", "")];
 
                         if not tag then return end
