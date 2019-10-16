@@ -107,11 +107,127 @@ local keys = gears.table.join(
         "Return", 
         function () 
             local tag = awful.screen.focused().selected_tag
+            if not tag then return end;
             local command = config.terminal .. " --command tmux attach -t '" .. (tag.name or "") .. "'"
 
             awful.spawn(command) 
         end,
         {description = "open a terminal", group = "launcher"}
+    ),
+    awful.key(
+        { config.modkey, },
+        "a",
+        function()
+            awful.spawn.easy_async("rofi -dmenu -markup -p 'Workspace' -lines 0 -location 2 | echo",
+                function(tag_name, err, reason, exit_code)
+                    if exit_code == 0 then 
+                        awful.spawn.easy_async("rofi -dmenu -markup -p 'Workdir' -lines 0 -location 2",
+                            function(path, err, reason, exit_code)
+                                if exit_code == 0 then 
+
+                                    local command = "tmux new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
+
+                                    awful.spawn.with_shell(command);
+
+                                    local tag = awful.tag.add(
+                                       tag_name:gsub("\n", ""),
+                                       {
+                                           screen = awful.screen.focused(),
+                                           layout = awful.layout.layouts[2]
+                                       }
+                                    );
+                                    tag.workdir = path:gsub("\n", "");
+                                    tag:view_only();
+                                end
+                        end);
+                    end;
+            end);
+        end,
+        {description = "new tag", group = "tags"}
+    ),
+    awful.key(
+        { config.modkey, "Shift" },
+        "a",
+        function()
+            awful.spawn.easy_async("rofi -dmenu -markup -p 'Workspace' -lines 0 -location 2 | echo",
+                function(tag_name, err, reason, exit_code)
+                    if exit_code == 0 then 
+                        if not client.focus then return end;
+
+                        local command = "tmux new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
+
+                        awful.spawn.with_shell(command);
+
+                        local tag = awful.tag.add(
+                           tag_name:gsub("\n", ""),
+                           {
+                               screen = awful.screen.focused(),
+                               layout = awful.layout.layouts[2],
+                               volatile = true
+                           }
+                        );
+                        tag.workdir = path:gsub("\n", "");
+                        client.focus:tags({tag});
+                        tag:view_only();
+                    end;
+            end);
+        end,
+        {description = "new tag", group = "tags"}
+    ),
+    awful.key(
+        { config.modkey, "Shift" },
+        "d", 
+        function () 
+            local tag = awful.screen.focused().selected_tag
+            if not tag then return end;
+            tag:delete();
+        end,
+        {description = "delete tag", group = "tags"}
+    ),
+    awful.key(
+        { config.modkey, "Shift" },
+        "r", 
+        function () 
+            awful.spawn.easy_async("rofi -dmenu -markup -p 'Rename' -lines 0 -location 2",
+                function(tag_name, err, reason, exit_code)
+                    if exit_code == 0 then 
+                        local tag = awful.screen.focused().selected_tag
+                        if not tag then return end;
+                        tag.name = tag_name:gsub("\n", "");
+                    end
+            end);
+        end,
+        {description = "rename tag", group = "tags"}
+    ),
+    awful.key(
+        { config.modkey, },
+        "t", 
+        function () 
+            local tags = awful.screen.focused().tags;
+            local tags_str = "";
+            for i=1, #tags do
+                local tag = tags[i];
+                if #tags_str > 0 then
+                    tags_str = tags_str .. ";";
+                end
+                tags_str = tags_str .. tag.name;
+                tags[tag.name] = tag;
+            end
+
+            awful.spawn.easy_async_with_shell("echo -e '" .. tags_str .. "' | rofi -dmenu -markup -p 'Tags' -lines " .. #tags .. " -location 2 -sep ';'" ,
+                function(tag_name, err, reason, exit_code)
+                    if exit_code == 0 then 
+                        debug.print("debug", tag_name);
+                        local tag = tags[tag_name:gsub("\n", "")];
+
+                        if not tag then return end
+
+                        tag:view_only();
+                    end
+                end
+            );
+        end,
+        {description = "rename tag", group = "tags"}
     ),
     awful.key(
         { config.modkey, "Control" },
@@ -244,36 +360,7 @@ for i = 1, 7 do
             end,
             {description = "toggle tag #" .. i, group = "tag"}
         ),
-        awful.key(
-            { config.modkey, "Shift" },
-            "a",
-            function()
-                awful.spawn.easy_async("rofi -dmenu -markup -mesg 'Workspace' -lines 0 -location 2 | echo",
-                    function(tag_name, err, reason, exit_code)
-                        if exit_code == 0 then 
-                            awful.spawn.easy_async("rofi -dmenu -markup -mesg 'Workdir' -lines 0 -location 2",
-                                function(path, err, reason, exit_code)
-                                    if exit_code == 0 then 
-
-                                        local command = "tmux new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
-
-                                        awful.spawn.with_shell(command);
-
-                                        local tag = awful.tag.add(
-                                           tag_name:gsub("\n", ""),
-                                           {
-                                               screen = awful.screen.focused(),
-                                               layout = awful.layout.layouts[2]
-                                           }
-                                        );
-                                        tag.workdir = path:gsub("\n", "");
-                                        tag:view_only();
-                                    end
-                            end);
-                        end;
-                end);
-            end
-        ),
+        
         -- Move client to tag.
         awful.key(
             { config.modkey, "Shift" },
