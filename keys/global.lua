@@ -108,9 +108,10 @@ local keys = gears.table.join(
         function () 
             local tag = awful.screen.focused().selected_tag
             if not tag then return end;
-            local command = config.terminal .. " --command tmux attach -t '" .. (tag.name or "") .. "'"
+            -- TODO Screen as group?
+            local command = config.terminal .. " --command tmux new-session -A -c '" .. (tag.workdir or "")  .. "' -s '" .. (tag.name or "") .. "'"
 
-            awful.spawn(command) 
+            awful.spawn(command)
         end,
         {description = "open a terminal", group = "launcher"}
     ),
