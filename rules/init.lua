@@ -7,6 +7,7 @@ local chats = require("rules.chats");
 local rider = require("rules.rider");
 local web = require("rules.web");
 local pip = require("rules.pip");
+local term = require("rules.term");
 local gears = require("gears");
 
 local rules = {
@@ -18,11 +19,8 @@ local rules = {
     web,
     pip,
     chats,
-    rider
-
-    -- Set Firefox to always map on the tag named "2" on screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { screen = 1, tag = "2" } },) (
+    rider,
+    term,
 };
 
 return rules;
