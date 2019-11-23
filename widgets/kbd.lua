@@ -1,6 +1,5 @@
 local awful = require("awful");
-local naughty = require("naughty")
-
+local debug = require("utils.debug")
 local applications = {};
 local current = 0;
 

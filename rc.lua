@@ -44,28 +44,19 @@ menubar.utils.terminal = config.global.terminal
 -- TODO move to utils
 local function set_wallpaper(s)
     path = beautiful.wallpapers_path
-    wallpapers = {}
-    awful.spawn.with_line_callback(
-        "ls " .. path,
+    local cmd = "/home/blackcat/.config/awesome/scripts/next_background.sh " .. path .. " " .. 30
+    local result = awful.spawn.with_line_callback(
+        cmd,
         {
             stdout = function(str)
-                wallpapers[#wallpapers + 1] = path .. str
+                gears.wallpaper.maximized(str, s, true)
             end,
-            output_done = function()
-
-                local wallpaper = wallpapers[math.random(1, #wallpapers)]
-                gears.wallpaper.maximized(wallpaper, s, true)
-
-                gears.timer {
-                    timeout = 30,
-                    autostart = true,
-                    callback =
-                        function()
-                            local wallpaper = wallpapers[math.random(1, #wallpapers)]
-                            gears.wallpaper.maximized(wallpaper, s, true)
-                        end
-                }
-            end
+            stderr = function(str)
+            end,
+            output_done = function(str)
+            end,
+            exit = function(str)
+            end,
         }
     )
 end

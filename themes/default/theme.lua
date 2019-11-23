@@ -3,7 +3,7 @@ local dpi = require("beautiful.xresources").apply_dpi
 
 -- {{{ Main
 local theme = {}
-theme.wallpapers_path = "~/Wallpapers/" --require("awful").util.getdir("home")
+theme.wallpapers_path = "~/Wallpapers" --require("awful").util.getdir("home")
 -- }}}
 
 -- {{{ Styles 
