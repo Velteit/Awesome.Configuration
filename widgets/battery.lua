@@ -15,89 +15,47 @@ local states = {
     ["Charging"] = 1,
     ["Full Charged"] = 2
 }
-awful.spawn.easy_async(
-    string.format("cat /sys/class/power_supply/%s/capacity", widget.battery_name),
-    function(out, err, exit_reason, exit_code) 
-        local value = tonumber(out);
 
-        if not (value == widget.value) then
-            widget.value = value;
-            widget.state_changed = true;
-        end
-    end
-);
-awful.spawn.easy_async(
-    string.format("cat /sys/class/power_supply/%s/status", widget.battery_name),
-    function(out, err, exit_reason, exit_code)
-        if not (widget.state == out) then
-            widget.state = out;
-            widget.state_changed = true;
-        end
-    end
-);
-gears.timer {
-    timeout = 2,
-    autostart = true,
-    callback = 
-        function() 
-            awful.spawn.easy_async(
-                string.format("cat /sys/class/power_supply/%s/capacity", widget.battery_name),
-                function(out, err, exit_reason, exit_code) 
-                    local value = tonumber(out);
+local cmd = string.format('cat /sys/class/power_supply/%s/{capacity,status}', widget.battery_name)
 
-                    if not (value == widget.value) then
-                        widget.value = value;
-                        widget.state_changed = true;
-                    end
-                end
-            );
-            awful.spawn.easy_async(
-                string.format("cat /sys/class/power_supply/%s/status", widget.battery_name),
-                function(out, err, exit_reason, exit_code)
-                    if not (widget.state == out) then
-                        widget.state = out;
-                        widget.state_changed = true;
-                    end
-                end
-            );
-
-        end
-}
-
+naughty.notify({text = cmd});
 widget.widget = awful.widget.watch(
-    'echo 1', 
+    string.format("bash -c '%s'", cmd),
     5, 
-    function(w, stdout)  
-        if widget.state_changed then
-            widget.state_changed = false;
+    function(w, stdout)
+        local splited = {};
+        for line in stdout:gmatch("[^\r\n]+") do
+            table.insert(splited, line);
+        end
 
-            local widgets = w:get_all_children();
-            local progress = widgets[1];
-            local text = widgets[2].widget;
+        local value = tonumber(splited[1]);
+        local state = splited[2];
+        local widgets = w:get_all_children();
+        local progress = widgets[1];
+        local text = widgets[2].widget;
 
-            progress:set_value(widget.value/100);
+        progress:set_value(value/100);
 
-            if widget.value > 50 then
-                progress.color = beautiful.bg_focus;
-            end
+        if value > 50 then
+            progress.color = beautiful.bg_focus;
+        end
 
-            if widget.value < 49 then
-                progress.color = beautiful.bg_urgent;
-            end
+        if value < 49 then
+            progress.color = beautiful.bg_urgent;
+        end
 
-            if states[widget.state] == 0 then
-                text:set_text(string.format("%d%s D", widget.value, '%'));
-            end
-            if states[widget.state] == 1 and not (widget.value == 100) then
-                text:set_text(string.format("%d%s C", widget.value, '%'));
-            else
-                text:set_text(string.format("%d%s", widget.value, '%'));
-            end
+        if states[state] == 0 then
+            text:set_text(string.format("%d%s D", value, '%'));
+        end
+        if states[state] == 1 and not (value == 100) then
+            text:set_text(string.format("%d%s C", value, '%'));
+        else
+            text:set_text(string.format("%d%s", value, '%'));
+        end
 
-            if states[widget.state] == 2 then
-                text:set_text(string.format("%d% D", widget.value));
-            end
-       end
+        if states[state] == 2 then
+            text:set_text(string.format("%d% D", value));
+        end
     end,
     wibox.widget {
         {
