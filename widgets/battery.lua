@@ -18,7 +18,6 @@ local states = {
 
 local cmd = string.format('cat /sys/class/power_supply/%s/{capacity,status}', widget.battery_name)
 
-naughty.notify({text = cmd});
 widget.widget = awful.widget.watch(
     string.format("bash -c '%s'", cmd),
     5, 

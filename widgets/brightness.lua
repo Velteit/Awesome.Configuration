@@ -6,57 +6,64 @@ local wibox = require("wibox")
 local naughty = require("naughty")
 
 local widget = {
-    state = 0, 
-    state_changed = false,
     changing_value = 2.5
 };
-awful.spawn.easy_async(
-    "xbacklight -get",
-    function(stdout, stderr, reason, exit_code)
-        widget.state = tonumber(stdout);
-        widget.state_changed = true;
-    end
-);
 
 function widget.brightess_up()
-    if widget.state + widget.changing_value < 100 then
-        awful.spawn(string.format("xbacklight -inc %f", widget.changing_value));
-        widget.state = widget.state + widget.changing_value;
-        widget.state_changed = true;
-    end
+    awful.spawn.easy_async(
+        "xbacklight -get",
+        function(stdout, stderr, reason, exit_code)
+            local state = tonumber(stdout);
+            if state + widget.changing_value < 100 then
+                awful.spawn(string.format("xbacklight -inc %f", widget.changing_value));
+            end
+        end
+    );
 end
 
 function widget.brightess_down()
-    if widget.state - widget.changing_value > 0 then
-        awful.spawn(string.format("xbacklight -dec %f", widget.changing_value));
-        widget.state = widget.state - widget.changing_value;
-        widget.state_changed = true;
-    end
+    awful.spawn.easy_async(
+        "xbacklight -get",
+        function(stdout, stderr, reason, exit_code)
+            local state = tonumber(stdout);
+            if state + widget.changing_value < 100 then
+                awful.spawn(string.format("xbacklight -dec %f", widget.changing_value));
+            end
+        end
+    );
 end
 
-widget.widget = awful.widget.watch(
-    "echo 0",
-    1,
-    function(progress, stdout) 
-        if widget.state_changed then
-            progress:set_value(widget.state/100);
-            widget.state_changed = false;
-        end
-    end,
-    wibox.widget {
-        max_value     = 1,
-        value         = 0.5,
-        forced_height = 20,
-        forced_width  = 50,
-        paddings      = 1,
-        color = beautiful.bg_urgent,
-        background_color = beautiful.bg_normal,
-        border_color = beautiful.border_normal,
-        border_width = 0.8,
-        shape         = gears.shape.powerline,
-        widget        = wibox.widget.progressbar,
-    }
+local inner_widget = wibox.widget {
+    max_value     = 1,
+    value         = 0.5,
+    forced_height = 20,
+    forced_width  = 50,
+    paddings      = 1,
+    color = beautiful.bg_urgent,
+    background_color = beautiful.bg_normal,
+    border_color = beautiful.border_normal,
+    border_width = 0.8,
+    shape         = gears.shape.powerline,
+    widget        = wibox.widget.progressbar,
+}
+
+inner_widget:buttons(
+    gears.table.join(
+        awful.button({ }, 4, widget.brightess_up),
+        awful.button({ }, 5, widget.brightess_down)
+    )
 )
+
+widget.widget = awful.widget.watch(
+    "xbacklight -get",
+    0.5,
+    function(progress, stdout) 
+        local state = tonumber(stdout);
+        progress:set_value(state/100);
+    end,
+    inner_widget
+)
+
 widget.keys = gears.table.join(
     awful.key(
         {},
@@ -71,4 +78,5 @@ widget.keys = gears.table.join(
         {description = "Brightness Down", group = "widgets:brightess"}
     )
 );
+
 return widget;
