@@ -30,7 +30,7 @@ function workdir_choose(path, tag_name)
                     return;
                 end
 
-                local command = "tmux new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
+                local command = "tmux -f ~/.config/tmux/conf new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
 
                 awful.spawn.with_shell(command);
 
@@ -151,9 +151,17 @@ local keys = gears.table.join(
             local tag = awful.screen.focused().selected_tag
             if not tag then return end;
             -- TODO Screen as group?
-            local command = config.terminal .. " --command tmux new-session -A -c '" .. (tag.workdir or "")  .. "' -s '" .. (tag.name or "") .. "'"
+            local command = config.terminal .. " --command tmux -f ~/.config/tmux/conf new-session -A -c '" .. (tag.workdir or "")  .. "' -s '" .. (tag.name or "") .. "'"
 
             awful.spawn(command)
+        end,
+        {description = "open a terminal", group = "launcher"}
+    ),
+    awful.key(
+        { config.modkey, "Shift" },
+        "Return", 
+        function () 
+            awful.spawn(config.terminal)
         end,
         {description = "open a terminal", group = "launcher"}
     ),
@@ -172,7 +180,7 @@ local keys = gears.table.join(
                     if exit_code == 0 then 
                         if not client.focus then return end;
 
-                        local command = "tmux new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
+                        local command = "tmux -f ~/.config/tmux/conf new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
 
                         awful.spawn.with_shell(command);
 
