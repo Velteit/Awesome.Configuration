@@ -3,6 +3,17 @@ local awful = require("awful")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
 local config = require("config.global");
 local debug = require("utils.debug");
+-- local mouse = require("awful.mouse");
+
+turbo_mode = false;
+
+function mouse_speed()
+    if turbo_mode then
+        return 20;
+    end;
+    return 5;
+end
+
 require("awful.hotkeys_popup.keys")
 function new_tag()
     awful.spawn.easy_async("rofi -dmenu -markup -p 'Workspace' -lines 0 -location 2 | echo",
@@ -30,7 +41,7 @@ function workdir_choose(path, tag_name)
                     return;
                 end
 
-                local command = "tmux -f ~/.config/tmux/conf new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
+                local command = "tmux -f /home/blackcat/.config/tmux/conf new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
 
                 awful.spawn.with_shell(command);
 
@@ -48,6 +59,140 @@ function workdir_choose(path, tag_name)
 end
 
 local keys = gears.table.join(
+    awful.key(
+        { },
+        "#87", -- KP_1
+        function ()
+            local current = mouse.coords();
+
+            mouse.coords({
+                x = current.x - mouse_speed(),
+                y = current.y + mouse_speed()
+            });
+        end
+    ),
+    awful.key(
+        {},
+        "#88", -- KP_2
+        function ()
+            local current = mouse.coords();
+
+            mouse.coords {
+                x = current.x,
+                y = current.y + mouse_speed()
+            };
+        end
+    ),
+    awful.key(
+        { },
+        "#89", -- KP_3
+        function ()
+            local current = mouse.coords();
+
+            mouse.coords({
+                x = current.x + mouse_speed(),
+                y = current.y + mouse_speed()
+            });
+        end
+    ),
+    awful.key(
+        { },
+        "#83", -- KP_4
+        function ()
+            local current = mouse.coords();
+
+            mouse.coords {
+                x = current.x - mouse_speed(),
+                y = current.y
+            };
+        end
+    ),
+    awful.key(
+        {},
+        "#84", -- KP_2
+        function ()
+            turbo_mode = not turbo_mode;
+            
+        end
+    ),
+    awful.key(
+        {},
+        "#85", -- KP_6
+        function ()
+            local current = mouse.coords();
+
+            mouse.coords {
+                x = current.x + mouse_speed(),
+                y = current.y
+            };
+        end
+    ),
+
+    awful.key(
+        { },
+        "#79", -- KP_7
+        function ()
+            local current = mouse.coords();
+
+            mouse.coords({
+                x = current.x - mouse_speed(),
+                y = current.y - mouse_speed()
+            });
+        end
+    ),
+    awful.key(
+        { },
+        "#80", -- KP_8
+        function ()
+            local current = mouse.coords();
+
+            mouse.coords({
+                x = current.x,
+                y = current.y - mouse_speed()
+            });
+        end
+    ),
+    awful.key(
+        { },
+        "#81", -- KP_9
+        function ()
+            local current = mouse.coords();
+
+            mouse.coords({
+                x = current.x + mouse_speed(),
+                y = current.y - mouse_speed()
+            });
+        end
+    ),
+    awful.key(
+        { },
+        "#90", -- KP_0
+        function()
+            awful.spawn("xdotool click 1");
+        end
+    ),
+    awful.key(
+        { },
+        "#91", -- KP_Decimal
+        function()
+            awful.spawn("xdotool click 3");
+        end
+    ),
+    awful.key(
+        { },
+        "#104", -- KP_Enter
+        function()
+            awful.spawn("xdotool click 5");
+        end
+    ),
+    awful.key(
+        { },
+        "#86", -- KP_Add
+        function()
+            awful.spawn("xdotool click 4");
+        end
+    ),
+
     awful.key(
         { config.modkey, }, 
         "s",
@@ -151,7 +296,7 @@ local keys = gears.table.join(
             local tag = awful.screen.focused().selected_tag
             if not tag then return end;
             -- TODO Screen as group?
-            local command = config.terminal .. " --command tmux -f ~/.config/tmux/conf new-session -A -c '" .. (tag.workdir or "")  .. "' -s '" .. (tag.name or "") .. "'"
+            local command = config.terminal .. " tmux -f /home/blackcat/.config/tmux/conf new-session -A -c '" .. (tag.workdir or "")  .. "' -s '" .. (tag.name or "") .. "'"
 
             awful.spawn(command)
         end,
@@ -180,7 +325,7 @@ local keys = gears.table.join(
                     if exit_code == 0 then 
                         if not client.focus then return end;
 
-                        local command = "tmux -f ~/.config/tmux/conf new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
+                        local command = "tmux -f /home/blackcat/.config/tmux/conf new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
 
                         awful.spawn.with_shell(command);
 

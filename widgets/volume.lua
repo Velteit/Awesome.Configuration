@@ -10,18 +10,16 @@ local widget = {
     changing_value = 1,
     muted = false
 }
-command = "pactl list sinks | grep '^[[:space:]]Volume:' | head -n $(( $("..sink..") + 1 )) | tail -n 1 | sed -e 's,.* \\([0-9][0-9]*\\)%.*,\\1,'"
+volume = "pactl list sinks | grep '^[[:space:]]Volume:' | head -n $(( $("..sink..") + 1 )) | tail -n 1 | sed -e 's,.* \\([0-9][0-9]*\\)%.*,\\1,'"
 
-function percent(value, p)
-    return value * (p/100)
-end
 
 function widget.volume_up()
-    awful.spawn.with_shell(string.format("pactl set-sink-volume $(%s) +%f%%", sink, widget.changing_value));
+    local command = string.format("pactl set-sink-volume $(%s) +%d%%", sink, widget.changing_value)
+    awful.spawn.with_shell(command);
 
     awful.spawn.easy_async_with_shell(
-        command,
-        function(stdout)
+        volume,
+        function(stdout, stderr)
             naughty.notify({
                 title = "Volume",
                 text = stdout,
@@ -34,7 +32,7 @@ end
 function widget.volume_down()
     awful.spawn.with_shell(string.format("pactl set-sink-volume $(%s) -%f%%", sink, widget.changing_value));
     awful.spawn.easy_async_with_shell(
-        command,
+        volume,
         function(stdout)
             naughty.notify({
                 title = "Volume",
@@ -90,8 +88,7 @@ inner_widget:buttons(
 
 
 widget.widget = awful.widget.watch(
-    string.format("bash -c \"%s\"", command),
-    -- command,
+    string.format("bash -c \"%s\"", volume),
     1,
     function(w, stdout) 
         local widgets = w:get_all_children();

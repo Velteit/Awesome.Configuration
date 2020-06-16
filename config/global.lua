@@ -1,5 +1,6 @@
 local global = {
-    terminal = "alacritty",
+    -- terminal = "alacritty",
+    terminal = "kitty",
     modkey = "Mod4",
     editor = "vim"
 };

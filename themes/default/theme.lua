@@ -142,6 +142,9 @@ theme.titlebar_maximized_button_normal_inactive = theme_path .. "titlebar/maximi
 -- }}}
 -- }}}
 
+theme.notification_max_height = 100
+theme.notification_max_width = 500
+
 return theme
 
 -- vim: filetype=lua:expandtab:shiftwidth=4:tabstop=8:softtabstop=4:textwidth=80
