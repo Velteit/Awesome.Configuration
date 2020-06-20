@@ -8,39 +8,27 @@ theme.wallpapers_path = "~/Wallpapers" --require("awful").util.getdir("home")
 
 -- {{{ Styles 
 -- theme.font      = "Terminus (TTF) 9"
-theme.font      = "Noto Sans 8"
+theme.font      = "JetBrains Mono 9"
 
 -- {{{ Colors
-theme.fg_normal  = "#DABB8D"
-theme.fg_focus   = "#16304C"
-theme.fg_urgent  = "#8EA4BA"
+theme.fg_normal     = "#c6c8d1"
+theme.fg_focus      = "#eff0f4"
+theme.fg_urgent     = "#6b7089"
 
-theme.bg_normal  = "#3B4958"
-theme.bg_focus   = "#7E9BBA"
-theme.bg_urgent  = "#75531F"
+theme.bg_normal     = "#161821"
+theme.bg_focus      = "#3e445e"
+theme.bg_urgent     = "#b4be82"
 
-theme.border_normal = "#7E9BBA"
-theme.border_focus  = "#16304C"
-theme.border_marked = "#8EA4BA"
-
--- theme.fg_focus  = "#DABB8D"
--- theme.fg_normal   = "#16304C"
--- theme.fg_urgent  = "#8EA4BA"
-
--- theme.bg_focus  = "#3B4958"
--- theme.bg_normal   = "#7E9BBA"
--- theme.bg_urgent  = "#75531F"
+theme.border_normal = "#c6c8d1"
+theme.border_focus  = "#1e2132"
+theme.border_marked = "#161821"
 
 theme.bg_systray = theme.bg_normal
 -- }}}
 
 -- {{{ Borders
 theme.useless_gap   = dpi(1)
-theme.border_width  = dpi(3)
-
--- theme.border_focus = "#7E9BBA"
--- theme.border_normal  = "#16304C"
--- theme.border_marked = "#8EA4BA"
+theme.border_width  = dpi(2)
 -- }}}
 
 -- {{{ Titlebars
