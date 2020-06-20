@@ -8,7 +8,7 @@ local widget = {
     state = "",
     value = 10,
     state_changed = false,
-    battery_name = "BAT1",
+    battery_name = "BAT0",
 };
 local states = {
     ["Discharging"] = 0,
