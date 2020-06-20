@@ -13,6 +13,7 @@ local widgets = require("widgets");
 local config = require("config");
 local events = require("events");
 local autorun = require("autorun");
+local debug = require("utils.debug");
 
 
 local ctx = { client = client, awesome = awesome, root = root, screen = screen };
@@ -43,8 +44,9 @@ menubar.utils.terminal = config.global.terminal
 
 -- TODO move to utils
 local function set_wallpaper(s)
-    path = beautiful.wallpapers_path
+    local path = beautiful.wallpapers_path
     local cmd = "/home/blackcat/.config/awesome/scripts/next_background.sh " .. path .. " " .. 30
+
     local result = awful.spawn.with_line_callback(
         cmd,
         {
@@ -60,6 +62,7 @@ local function set_wallpaper(s)
         }
     )
 end
+
 --TODO move to events
 screen.connect_signal("property::geometry", set_wallpaper)
 
@@ -76,7 +79,7 @@ awful.screen.connect_for_each_screen(function(s)
         awful.tag.add(tag.name, {
             layout = tag.layout,
             screen = s,
-            gap = tag.gap or 2.0,
+            gap = tag.gap or 1.0,
             gap_single_client = false,
             index = tag.index,
             selected = tag.index == 1
@@ -101,10 +104,11 @@ awful.screen.connect_for_each_screen(function(s)
             layout = wibox.layout.fixed.horizontal,
             s.mypromptbox,
             widgets.kbd.widget,
+            widgets.separator,
             widgets.battery.widget,
             widgets.separator,
             widgets.brightness.widget,
-            widgets.volume.widget,
+            -- widgets.volume.widget,
             wibox.widget.systray(),
             widgets.clock.widget,
             s.mylayoutbox,
@@ -117,7 +121,7 @@ root.buttons(gears.table.join(
     awful.button({ }, 3, function () mymainmenu:toggle() end)
 ))
 -- TODO move to keys.init
-root.keys(gears.table.join(keys, widgets.brightness.keys, widgets.volume.keys))
+root.keys(gears.table.join(widgets.brightness.keys, keys))
 
 -- TODO move to rules.init
 awful.rules.rules = rules
