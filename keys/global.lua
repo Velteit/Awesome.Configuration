@@ -25,7 +25,8 @@ function new_tag()
 end
 
 function workdir_choose(path, tag_name)
-    local command = "(ls -d . .. $(realpath "..path..")/*/ 2>/dev/null || echo '.\n..') | rofi -dmenu -markup -p $(realpath "..path..") -lines 5 -location 2"
+    local command = "(ls -d . .. $(realpath "..path..")/*/ 2>/dev/null || echo '.\n..') | rofi -dmenu -markup -p $(realpath "..path..") -lines 5 -location 2 -matching normal --sorting-method normal -case-sensitive False"
+
     awful.spawn.easy_async_with_shell(command,
         function(str, err, reason, exit_code)
             -- debug.print("err", err)
@@ -41,7 +42,7 @@ function workdir_choose(path, tag_name)
                     return;
                 end
 
-                local command = "tmux -f /home/blackcat/.config/tmux/conf new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
+                local command = "tmux new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
 
                 awful.spawn.with_shell(command);
 
@@ -56,142 +57,42 @@ function workdir_choose(path, tag_name)
                 tag:view_only();
             end
     end);
+    -- awful.spawn.easy_async_with_shell(command,
+    --     function(str, err, reason, exit_code)
+            
+    --     end
+    -- );
+    -- -c $(FZF_DEFAULT_COMMAND=\"find $(realpath "..path..") -type d\" fzf)
+    -- local terminal = 
+    --     config.terminal
+    --         .." -o title="..tag_name:gsub("\n", "")
+    --         .." tmux -f /home/blackcat/.config/tmux/conf new-session -d   -s \""..tag_name:gsub("\n", "").."\"\n"
+    --     ;
+
+
+    -- awful.spawn(terminal);
+
+    -- local command = 
+    --     "tmux send-keys -t 
+
+    -- awful.spawn.with_shell(terminal);
+
+    -- local tag = awful.tag.add(
+    --    tag_name:gsub("\n", ""),
+    --    {
+    --        screen = awful.screen.focused(),
+    --        layout = awful.layout.layouts[2],
+    --        volatile = true
+    --    }
+    -- );
+
+    -- -- tag.workdir = path:gsub("\n", "");
+
+    -- tag:view_only();
+
 end
 
 local keys = gears.table.join(
-    awful.key(
-        { },
-        "#87", -- KP_1
-        function ()
-            local current = mouse.coords();
-
-            mouse.coords({
-                x = current.x - mouse_speed(),
-                y = current.y + mouse_speed()
-            });
-        end
-    ),
-    awful.key(
-        {},
-        "#88", -- KP_2
-        function ()
-            local current = mouse.coords();
-
-            mouse.coords {
-                x = current.x,
-                y = current.y + mouse_speed()
-            };
-        end
-    ),
-    awful.key(
-        { },
-        "#89", -- KP_3
-        function ()
-            local current = mouse.coords();
-
-            mouse.coords({
-                x = current.x + mouse_speed(),
-                y = current.y + mouse_speed()
-            });
-        end
-    ),
-    awful.key(
-        { },
-        "#83", -- KP_4
-        function ()
-            local current = mouse.coords();
-
-            mouse.coords {
-                x = current.x - mouse_speed(),
-                y = current.y
-            };
-        end
-    ),
-    awful.key(
-        {},
-        "#84", -- KP_2
-        function ()
-            turbo_mode = not turbo_mode;
-            
-        end
-    ),
-    awful.key(
-        {},
-        "#85", -- KP_6
-        function ()
-            local current = mouse.coords();
-
-            mouse.coords {
-                x = current.x + mouse_speed(),
-                y = current.y
-            };
-        end
-    ),
-
-    awful.key(
-        { },
-        "#79", -- KP_7
-        function ()
-            local current = mouse.coords();
-
-            mouse.coords({
-                x = current.x - mouse_speed(),
-                y = current.y - mouse_speed()
-            });
-        end
-    ),
-    awful.key(
-        { },
-        "#80", -- KP_8
-        function ()
-            local current = mouse.coords();
-
-            mouse.coords({
-                x = current.x,
-                y = current.y - mouse_speed()
-            });
-        end
-    ),
-    awful.key(
-        { },
-        "#81", -- KP_9
-        function ()
-            local current = mouse.coords();
-
-            mouse.coords({
-                x = current.x + mouse_speed(),
-                y = current.y - mouse_speed()
-            });
-        end
-    ),
-    awful.key(
-        { },
-        "#90", -- KP_0
-        function()
-            awful.spawn("xdotool click 1");
-        end
-    ),
-    awful.key(
-        { },
-        "#91", -- KP_Decimal
-        function()
-            awful.spawn("xdotool click 3");
-        end
-    ),
-    awful.key(
-        { },
-        "#104", -- KP_Enter
-        function()
-            awful.spawn("xdotool click 5");
-        end
-    ),
-    awful.key(
-        { },
-        "#86", -- KP_Add
-        function()
-            awful.spawn("xdotool click 4");
-        end
-    ),
 
     awful.key(
         { config.modkey, }, 
@@ -296,7 +197,7 @@ local keys = gears.table.join(
             local tag = awful.screen.focused().selected_tag
             if not tag then return end;
             -- TODO Screen as group?
-            local command = config.terminal .. " tmux -f /home/blackcat/.config/tmux/conf new-session -A -c '" .. (tag.workdir or "")  .. "' -s '" .. (tag.name or "") .. "'"
+            local command = config.terminal .. " tmux new-session -A -s '" .. (tag.name or "") .. "'"
 
             awful.spawn(command)
         end,
@@ -325,7 +226,7 @@ local keys = gears.table.join(
                     if exit_code == 0 then 
                         if not client.focus then return end;
 
-                        local command = "tmux -f /home/blackcat/.config/tmux/conf new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
+                        local command = "tmux new-session -d -s '" .. tag_name:gsub("\n", "") .. "'";
 
                         awful.spawn.with_shell(command);
 
@@ -337,7 +238,7 @@ local keys = gears.table.join(
                                volatile = true
                            }
                         );
-                        tag.workdir = path:gsub("\n", "");
+
                         client.focus:tags({tag});
                         tag:view_only();
                     end;

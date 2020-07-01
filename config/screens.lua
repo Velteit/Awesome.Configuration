@@ -5,12 +5,12 @@ local screens = {
         {
             index = 1,
             name = "Web",
-            layout = layouts[2],
+            layout = layouts[10],
         },
         {
             index = 2,
             name = "Chats",
-            layout = layouts[2],
+            layout = layouts[10],
         },
         -- {
         --     index = 3,

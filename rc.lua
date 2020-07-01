@@ -17,7 +17,7 @@ local debug = require("utils.debug");
 
 
 local ctx = { client = client, awesome = awesome, root = root, screen = screen };
-awful.util.shell="/bin/bash"
+awful.util.shell="/bin/zsh"
 config.init(ctx);
 widgets.init(ctx);
 
@@ -72,7 +72,7 @@ awful.screen.connect_for_each_screen(function(s)
     local sreen_config = config.screens.get_config(s);
 
     for _, tag in pairs(sreen_config) do
-        local command = "tmux -f /home/blackcat/.config/tmux/conf new-session -d -c ~/ -s '" .. tag.name .. "'";
+        local command = "tmux new-session -d -c ~/ -s '" .. tag.name .. "'";
 
         awful.spawn.with_shell(command);
 
