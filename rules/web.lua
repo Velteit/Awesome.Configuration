@@ -2,7 +2,7 @@ local awful = require("awful");
 
 local web = {
     rule_any = {
-        class = { "chromium" }
+        class = { "chromium", "firefox" }
     },
     properties = { 
         tag = "Web"
