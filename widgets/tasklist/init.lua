@@ -11,17 +11,16 @@ return function (s)
         filter   = awful.widget.tasklist.filter.currenttags,
         buttons  = buttons,
         style    = {
-            shape_border_width = 1,
+            shape_border_width = beautiful.border_width,
             shape_border_color = beautiful.border_normal,
-            shape  = gears.shape.powerline,
+            shape               = gears.shape.current_shape,
         },
         layout   = {
             spacing = 0,
             spacing_widget = {
                 {
                     color  = beautiful.border_marked,
-                    -- forced_width = 5,
-                    shape        = gears.shape.powerline,
+                    shape               = gears.shape.current_shape,
                     widget       = wibox.widget.separator
                 },
                 valign = 'center',

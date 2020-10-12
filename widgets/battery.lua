@@ -65,8 +65,8 @@ widget.widget = awful.widget.watch(
             paddings      = 1,
             background_color = beautiful.bg_normal,
             border_color = beautiful.border_normal,
-            border_width = 0.8,
-            shape         = gears.shape.powerline,
+            border_width        = beautiful.border_width,
+            shape               = gears.shape.current_shape,
             widget        = wibox.widget.progressbar,
         },
         {

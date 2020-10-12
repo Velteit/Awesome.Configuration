@@ -10,15 +10,15 @@ return function (s)
         screen = s,
         filter = awful.widget.taglist.filter.all,
         style   = {
-            shape_border_width = 1,
-            shape = gears.shape.powerline,
+            shape_border_width = beautiful.border_width,
+            shape               = gears.shape.current_shape,
             shape_border_color = beautiful.border_normal,
         },
         layout   = {
             spacing = 0,
             spacing_widget = {
                 color  = beautiful.border_marked,
-                shape  = gears.shape.powerline,
+                shape               = function (cr, w, h) return gears.shape.parallelogram(cr, w, h, w/1.2); end,
                 widget = wibox.widget.separator,
             },
             layout  = wibox.layout.fixed.horizontal
@@ -32,10 +32,10 @@ return function (s)
                                 id     = 'index_role',
                                 widget = wibox.widget.textbox,
                             },
-                            margins = 2,
+                            margins = 1,
                             widget = wibox.container.margin
                         },
-                        shape = gears.shape.powerline,
+                        shape               = gears.shape.current_shape,
                         widget = wibox.container.background
                     },
                     {
@@ -53,8 +53,8 @@ return function (s)
                     margins = 1,
                     layout = wibox.layout.fixed.horizontal,
                 },
-                left  = 14,
-                right = 14,
+                left  = 12,
+                right = 12,
                 widget = wibox.container.margin
             },
             id     = 'background_role',
@@ -65,7 +65,6 @@ return function (s)
             end,
             update_callback = function(self, c3, index, objects) --luacheck: no unused args
                 self:get_children_by_id('index_role')[1].markup = '<b> ['..index..'] </b>'
-
             end,
         },
         buttons = buttons

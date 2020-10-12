@@ -4,17 +4,18 @@ local awful = require("awful")
 local wibox = require("wibox")
 local naughty = require("naughty")
 
-sink = "pactl list short sinks | sed -e 's,^\\([0-9][0-9]*\\)[^0-9].*,\\1,' | head -n 1"
+sink = "${$(pactl list short sinks | grep RUNNING | sed -e 's,^\\([0-9][0-9]*\\)[^0-9].*,\\1,' | head -n 1):-$(pactl list short sinks | sed -e 's,^\\([0-9][0-9]*\\)[^0-9].*,\\1,' | head -n 1)}"
 
 local widget = {
     changing_value = 1,
-    muted = false
+    muted = false,
 }
-volume = "pactl list sinks | grep '^[[:space:]]Volume:' | head -n $(( $("..sink..") + 1 )) | tail -n 1 | sed -e 's,.* \\([0-9][0-9]*\\)%.*,\\1,'"
+volume = "pactl list sinks | grep '^[[:space:]]Volume:' | head -n $(( $(echo -ne "..sink..") + 1 )) | tail -n 1 | sed -e 's,.* \\([0-9][0-9]*\\)%.*,\\1,'"
+mute = "pactl list sinks | grep '^[[:space:]]Mute:' | head -n $(( $(echo -ne "..sink..") + 1 )) | tail -n 1 | sed -e 's,.* \\([0-9][0-9]*\\)%.*,\\1,'"
 
 
 function widget.volume_up()
-    local command = string.format("pactl set-sink-volume $(%s) +%d%%", sink, widget.changing_value)
+    local command = string.format("pactl set-sink-volume $(echo -ne %s) +%d%%", sink, widget.changing_value)
     awful.spawn.with_shell(command);
 
     awful.spawn.easy_async_with_shell(
@@ -30,7 +31,7 @@ function widget.volume_up()
 end
 
 function widget.volume_down()
-    awful.spawn.with_shell(string.format("pactl set-sink-volume $(%s) -%f%%", sink, widget.changing_value));
+    awful.spawn.with_shell(string.format("pactl set-sink-volume $(echo -ne %s) -%f%%", sink, widget.changing_value));
     awful.spawn.easy_async_with_shell(
         volume,
         function(stdout)
@@ -44,14 +45,36 @@ function widget.volume_down()
 end
 
 function widget.mute()
-    local value = 0;
-    if widget.muted then 
-        value = 0 
-    else
-        value = 1 
-    end
-    local mute_cmd = string.format("pactl set-sink-mute $(%s) %f", sink, value);
+    local command = string.format("pactl set-sink-mute $(echo -ne %s) toggle", sink);
+    awful.spawn.easy_async_with_shell(
+        command,
+        function()
+            awful.spawn.easy_async_with_shell(
+                mute,
+                function(stdout)
+                    local str = "Not Muted";
+
+                    widget.muted = trim(string.lower(stdout)) == "mute: yes";
+
+                    if widget.muted then
+                        str = "Muted";
+                    end
+
+                    naughty.notify({
+                        title = "Volume",
+                        text = str,
+                        preset = naughty.config.presets.normal
+                    });
+                end
+            );
+        end
+    );
+
     
+end
+
+function trim(s)
+  return (string.gsub(s, "^%s*(.-)%s*$", "%1"))
 end
 
 local inner_widget = wibox.widget {
@@ -64,8 +87,8 @@ local inner_widget = wibox.widget {
         background_color = beautiful.bg_normal,
         color = beautiful.bg_focus,
         border_color = beautiful.border_normal,
-        border_width = 0.8,
-        shape         = gears.shape.powerline,
+        border_width        = beautiful.border_width,
+        shape               = gears.shape.current_shape,
         widget        = wibox.widget.progressbar,
     },
     {

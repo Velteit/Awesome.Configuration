@@ -3,6 +3,9 @@ local awful = require("awful")
 beautiful.init(awful.util.getdir("config") .. "themes/default/theme.lua")
 
 local gears = require("gears")
+
+gears.shape.current_shape = function (cr, w, h) return gears.shape.parallelogram(cr, w, h, w - h/math.tan(45)); end;
+
 require("awful.autofocus")
 local wibox = require("wibox")
 naughty = require("naughty")
@@ -103,12 +106,13 @@ awful.screen.connect_for_each_screen(function(s)
         {
             layout = wibox.layout.fixed.horizontal,
             s.mypromptbox,
+            widgets.mpc.widget,
             widgets.kbd.widget,
             widgets.separator,
             widgets.battery.widget,
             widgets.separator,
             widgets.brightness.widget,
-            -- widgets.volume.widget,
+            widgets.volume.widget,
             wibox.widget.systray(),
             widgets.clock.widget,
             s.mylayoutbox,
@@ -121,7 +125,13 @@ root.buttons(gears.table.join(
     awful.button({ }, 3, function () mymainmenu:toggle() end)
 ))
 -- TODO move to keys.init
-root.keys(gears.table.join(widgets.brightness.keys, keys))
+keys = gears.table.join(
+   widgets.brightness.keys,
+   widgets.volume.keys, 
+   widgets.mpc.keys,
+   keys
+)
+root.keys(keys)
 
 -- TODO move to rules.init
 awful.rules.rules = rules

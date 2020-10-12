@@ -5,14 +5,6 @@ local config = require("config.global");
 local debug = require("utils.debug");
 -- local mouse = require("awful.mouse");
 
-turbo_mode = false;
-
-function mouse_speed()
-    if turbo_mode then
-        return 20;
-    end;
-    return 5;
-end
 
 require("awful.hotkeys_popup.keys")
 function new_tag()
@@ -298,7 +290,7 @@ local keys = gears.table.join(
                 end
             );
         end,
-        {description = "rename tag", group = "tags"}
+        {description = "tags menu", group = "tags"}
     ),
     awful.key(
         { config.modkey, "Control" },
