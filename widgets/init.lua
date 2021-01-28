@@ -7,7 +7,7 @@ local kbd = require("widgets.kbd");
 local clock = require("widgets.clock");
 local newsboat = require("widgets.newsboat");
 local volume = require("widgets.volume");
-local mpc = require("widgets.mpc");
+-- local mpc = require("widgets.mpc");
 
 local widgets = { 
     brightness = brightness,
@@ -18,7 +18,7 @@ local widgets = {
     kbd = kbd,
     clock = clock,
     volume = volume,
-    mpc = mpc,
+    -- mpc = mpc,
 --    newsboat = newsboat
 };
 

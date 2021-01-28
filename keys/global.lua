@@ -7,81 +7,114 @@ local debug = require("utils.debug");
 
 
 require("awful.hotkeys_popup.keys")
+-- function new_tag()
+--     awful.spawn.easy_async("rofi -dmenu -markup -p 'Workspace' -lines 0 -location 2 | echo",
+--         function(tag_name, err, reason, exit_code)
+--             if exit_code == 0 then 
+--                 workdir_choose("~/", tag_name);
+--             end;
+--     end);
+-- end
+
+-- function workdir_choose(path, tag_name)
+--     local command = "(ls -d . .. $(realpath "..path..")/*/ 2>/dev/null || echo '.\n..') | rofi -dmenu -markup -p $(realpath "..path..") -lines 5 -location 2 -matching normal --sorting-method normal -case-sensitive False"
+
+--     awful.spawn.easy_async_with_shell(command,
+--         function(str, err, reason, exit_code)
+--             -- debug.print("err", err)
+--             -- debug.print("str", str)
+--             if exit_code == 0 then 
+--                 str = str:gsub("\n", "")
+--                 if str == ".." then
+--                     str = path .. str .. "/"
+--                 end
+
+--                 if str ~= "." then
+--                     workdir_choose(str, tag_name)
+--                     return;
+--                 end
+
+--                 local command = "tmux new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
+
+--                 awful.spawn.with_shell(command);
+
+--                 local tag = awful.tag.add(
+--                    tag_name:gsub("\n", ""),
+--                    {
+--                        screen = awful.screen.focused(),
+--                        layout = awful.layout.layouts[2]
+--                    }
+--                 );
+--                 tag.workdir = path:gsub("\n", "");
+--                 tag:view_only();
+--             end
+--     end);
+--     -- awful.spawn.easy_async_with_shell(command,
+--     --     function(str, err, reason, exit_code)
+            
+--     --     end
+--     -- );
+--     -- -c $(FZF_DEFAULT_COMMAND=\"find $(realpath "..path..") -type d\" fzf)
+--     -- local terminal = 
+--     --     config.terminal
+--     --         .." -o title="..tag_name:gsub("\n", "")
+--     --         .." tmux -f /home/blackcat/.config/tmux/conf new-session -d   -s \""..tag_name:gsub("\n", "").."\"\n"
+--     --     ;
+
+
+--     -- awful.spawn(terminal);
+
+--     -- local command = 
+--     --     "tmux send-keys -t 
+
+--     -- awful.spawn.with_shell(terminal);
+
+--     -- local tag = awful.tag.add(
+--     --    tag_name:gsub("\n", ""),
+--     --    {
+--     --        screen = awful.screen.focused(),
+--     --        layout = awful.layout.layouts[2],
+--     --        volatile = true
+--     --    }
+--     -- );
+
+--     -- -- tag.workdir = path:gsub("\n", "");
+
+--     -- tag:view_only();
+
+-- end
+
 function new_tag()
     awful.spawn.easy_async("rofi -dmenu -markup -p 'Workspace' -lines 0 -location 2 | echo",
         function(tag_name, err, reason, exit_code)
-            if exit_code == 0 then 
+            if exit_code == 0 then
                 workdir_choose("~/", tag_name);
             end;
     end);
 end
 
 function workdir_choose(path, tag_name)
-    local command = "(ls -d . .. $(realpath "..path..")/*/ 2>/dev/null || echo '.\n..') | rofi -dmenu -markup -p $(realpath "..path..") -lines 5 -location 2 -matching normal --sorting-method normal -case-sensitive False"
 
-    awful.spawn.easy_async_with_shell(command,
-        function(str, err, reason, exit_code)
-            -- debug.print("err", err)
-            -- debug.print("str", str)
-            if exit_code == 0 then 
-                str = str:gsub("\n", "")
-                if str == ".." then
-                    str = path .. str .. "/"
-                end
-
-                if str ~= "." then
-                    workdir_choose(str, tag_name)
-                    return;
-                end
-
-                local command = "tmux new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
-
-                awful.spawn.with_shell(command);
-
-                local tag = awful.tag.add(
-                   tag_name:gsub("\n", ""),
-                   {
-                       screen = awful.screen.focused(),
-                       layout = awful.layout.layouts[2]
-                   }
-                );
-                tag.workdir = path:gsub("\n", "");
-                tag:view_only();
-            end
-    end);
-    -- awful.spawn.easy_async_with_shell(command,
-    --     function(str, err, reason, exit_code)
-            
-    --     end
-    -- );
-    -- -c $(FZF_DEFAULT_COMMAND=\"find $(realpath "..path..") -type d\" fzf)
-    -- local terminal = 
-    --     config.terminal
-    --         .." -o title="..tag_name:gsub("\n", "")
-    --         .." tmux -f /home/blackcat/.config/tmux/conf new-session -d   -s \""..tag_name:gsub("\n", "").."\"\n"
-    --     ;
-
-
-    -- awful.spawn(terminal);
-
-    -- local command = 
-    --     "tmux send-keys -t 
-
-    -- awful.spawn.with_shell(terminal);
-
-    -- local tag = awful.tag.add(
-    --    tag_name:gsub("\n", ""),
-    --    {
-    --        screen = awful.screen.focused(),
-    --        layout = awful.layout.layouts[2],
-    --        volatile = true
-    --    }
-    -- );
-
-    -- -- tag.workdir = path:gsub("\n", "");
-
-    -- tag:view_only();
-
+    local terminal =
+        config.terminal
+            .." -o title=\""..tag_name:gsub("\n", "").."\""
+            .." --"
+            .." bash -c '"
+            .." tmux new-session -d"
+            .." -c $(FZF_DEFAULT_COMMAND=\"find ~/ -type d\" fzf)"
+            .." -s \""..tag_name:gsub("\n", "").."\""
+            .."'"
+    
+    local tag = awful.tag.add(
+       tag_name:gsub("\n", ""),
+       {
+           screen = awful.screen.focused(),
+           layout = awful.layout.layouts[2],
+           -- volatile = true
+       }
+    );
+    tag:view_only();
+    awful.spawn(terminal, { floating = true, tag = tag, placement = awful.placement.centered, height = 512, width = 768 });
 end
 
 local keys = gears.table.join(
@@ -114,7 +147,7 @@ local keys = gears.table.join(
         { config.modkey, },
         "j",
         function ()
-            awful.client.focus.byidx( 1)
+            awful.client.focus.byidx(-1)
         end,
         {description = "focus next by index", group = "client"}
     ),
@@ -122,7 +155,7 @@ local keys = gears.table.join(
         { config.modkey, },
         "k",
         function ()
-            awful.client.focus.byidx(-1)
+            awful.client.focus.byidx(1)
         end,
         {description = "focus previous by index", group = "client"}
     ),

@@ -1,0 +1,3 @@
+[submodule "RxLua"]
+	path = RxLua
+	url = git@github.com:bjornbytes/RxLua.git

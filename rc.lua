@@ -106,7 +106,7 @@ awful.screen.connect_for_each_screen(function(s)
         {
             layout = wibox.layout.fixed.horizontal,
             s.mypromptbox,
-            widgets.mpc.widget,
+            -- widgets.mpc.widget,
             widgets.kbd.widget,
             widgets.separator,
             widgets.battery.widget,
@@ -128,7 +128,7 @@ root.buttons(gears.table.join(
 keys = gears.table.join(
    widgets.brightness.keys,
    widgets.volume.keys, 
-   widgets.mpc.keys,
+   -- widgets.mpc.keys,
    keys
 )
 root.keys(keys)
