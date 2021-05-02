@@ -420,6 +420,15 @@ local keys = gears.table.join(
             -- awful.screen.focused().mypromptbox:run() 
         end,
         {description = "run prompt", group = "launcher"}
+    ),
+    awful.key(
+        { config.modkey },
+        "p",
+        function () 
+            awful.spawn("autopass", { screen = awful.screen.focused().index });
+            -- awful.screen.focused().mypromptbox:run() 
+        end,
+        {description = "run prompt", group = "launcher"}
     )
 )
 
