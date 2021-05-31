@@ -3,124 +3,16 @@ local awful = require("awful")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
 local config = require("config.global");
 local debug = require("utils.debug");
+local translate = require("widgets.translation");
+local SessionManager = require("session.SessionManager");
 -- local mouse = require("awful.mouse");
-
-
 require("awful.hotkeys_popup.keys")
--- function new_tag()
---     awful.spawn.easy_async("rofi -dmenu -markup -p 'Workspace' -lines 0 -location 2 | echo",
---         function(tag_name, err, reason, exit_code)
---             if exit_code == 0 then 
---                 workdir_choose("~/", tag_name);
---             end;
---     end);
--- end
 
--- function workdir_choose(path, tag_name)
---     local command = "(ls -d . .. $(realpath "..path..")/*/ 2>/dev/null || echo '.\n..') | rofi -dmenu -markup -p $(realpath "..path..") -lines 5 -location 2 -matching normal --sorting-method normal -case-sensitive False"
-
---     awful.spawn.easy_async_with_shell(command,
---         function(str, err, reason, exit_code)
---             -- debug.print("err", err)
---             -- debug.print("str", str)
---             if exit_code == 0 then 
---                 str = str:gsub("\n", "")
---                 if str == ".." then
---                     str = path .. str .. "/"
---                 end
-
---                 if str ~= "." then
---                     workdir_choose(str, tag_name)
---                     return;
---                 end
-
---                 local command = "tmux new-session -d -c " .. path:gsub("\n", "") .. " -s '" .. tag_name:gsub("\n", "") .. "'";
-
---                 awful.spawn.with_shell(command);
-
---                 local tag = awful.tag.add(
---                    tag_name:gsub("\n", ""),
---                    {
---                        screen = awful.screen.focused(),
---                        layout = awful.layout.layouts[2]
---                    }
---                 );
---                 tag.workdir = path:gsub("\n", "");
---                 tag:view_only();
---             end
---     end);
---     -- awful.spawn.easy_async_with_shell(command,
---     --     function(str, err, reason, exit_code)
-            
---     --     end
---     -- );
---     -- -c $(FZF_DEFAULT_COMMAND=\"find $(realpath "..path..") -type d\" fzf)
---     -- local terminal = 
---     --     config.terminal
---     --         .." -o title="..tag_name:gsub("\n", "")
---     --         .." tmux -f /home/blackcat/.config/tmux/conf new-session -d   -s \""..tag_name:gsub("\n", "").."\"\n"
---     --     ;
-
-
---     -- awful.spawn(terminal);
-
---     -- local command = 
---     --     "tmux send-keys -t 
-
---     -- awful.spawn.with_shell(terminal);
-
---     -- local tag = awful.tag.add(
---     --    tag_name:gsub("\n", ""),
---     --    {
---     --        screen = awful.screen.focused(),
---     --        layout = awful.layout.layouts[2],
---     --        volatile = true
---     --    }
---     -- );
-
---     -- -- tag.workdir = path:gsub("\n", "");
-
---     -- tag:view_only();
-
--- end
-
-function new_tag()
-    awful.spawn.easy_async("rofi -dmenu -markup -p 'Workspace' -lines 0 -location 2 | echo",
-        function(tag_name, err, reason, exit_code)
-            if exit_code == 0 then
-                workdir_choose("~/", tag_name);
-            end;
-    end);
-end
-
-function workdir_choose(path, tag_name)
-
-    local terminal =
-        config.terminal
-            .." -o title=\""..tag_name:gsub("\n", "").."\""
-            .." --"
-            .." bash -c '"
-            .." tmux new-session -d"
-            .." -c $(FZF_DEFAULT_COMMAND=\"find ~/ -type d\" fzf)"
-            .." -s \""..tag_name:gsub("\n", "").."\""
-            .."'"
-    
-    local tag = awful.tag.add(
-       tag_name:gsub("\n", ""),
-       {
-           screen = awful.screen.focused(),
-           layout = awful.layout.layouts[2],
-           -- volatile = true
-       }
-    );
-    tag:view_only();
-    awful.spawn(terminal, { floating = true, tag = tag, placement = awful.placement.centered, height = 512, width = 768 });
-end
 
 local keys = gears.table.join(
 
     awful.key(
-        { config.modkey, }, 
+        { config.modkey, },
         "s",
         hotkeys_popup.show_help,
         {description="show help", group="awesome"}
@@ -139,7 +31,7 @@ local keys = gears.table.join(
     ),
     awful.key(
         { config.modkey, },
-        "Escape", 
+        "Escape",
         awful.tag.history.restore,
         {description = "go back", group = "tag"}
     ),
@@ -179,35 +71,43 @@ local keys = gears.table.join(
     awful.key(
         { config.modkey, "Shift" },
         "k",
-        function () 
+        function ()
             awful.client.swap.byidx(-1)
         end,
         {description = "swap with previous client by index", group = "client"}
     ),
     awful.key(
-        { config.modkey, "Control" }, 
-        "j", 
+        { config.modkey, "Shift" },
+        "t",
         function ()
-            awful.screen.focus_relative( 1) 
+            translate.selected()
+        end,
+        {description = "swap with previous client by index", group = "client"}
+    ),
+    awful.key(
+        { config.modkey, "Control" },
+        "j",
+        function ()
+            awful.screen.focus_relative( 1)
         end,
         {description = "focus the next screen", group = "screen"}
     ),
     awful.key(
-        { config.modkey, "Control" }, 
-        "k", 
+        { config.modkey, "Control" },
+        "k",
         function ()
-            awful.screen.focus_relative(-1) 
+            awful.screen.focus_relative(-1)
         end,
         {description = "focus the previous screen", group = "screen"}
     ),
     awful.key(
-        { config.modkey, }, 
-        "u", 
+        { config.modkey, },
+        "u",
         awful.client.urgent.jumpto,
         {description = "jump to urgent client", group = "client"}
     ),
     awful.key(
-        { config.modkey, }, 
+        { config.modkey, },
         "Tab",
         function ()
             awful.menu.clients();
@@ -217,11 +117,11 @@ local keys = gears.table.join(
     -- Standard program
     awful.key(
         { config.modkey, },
-        "Return", 
-        function () 
+        "Return",
+        function ()
             local tag = awful.screen.focused().selected_tag
             if not tag then return end;
-            -- TODO Screen as group?
+            -- TODO move to SessionManager
             local command = config.terminal .. " tmux new-session -A -s '" .. (tag.name or "") .. "'"
 
             awful.spawn(command)
@@ -230,8 +130,8 @@ local keys = gears.table.join(
     ),
     awful.key(
         { config.modkey, "Shift" },
-        "Return", 
-        function () 
+        "Return",
+        function ()
             awful.spawn(config.terminal)
         end,
         {description = "open a terminal", group = "launcher"}
@@ -239,13 +139,16 @@ local keys = gears.table.join(
     awful.key(
         { config.modkey, },
         "a",
-        new_tag,
+        function()
+            SessionManager.singleton():addTag("/");
+        end,
         {description = "new tag", group = "tags"}
     ),
     awful.key(
         { config.modkey, "Shift" },
         "a",
         function()
+            --TODO add to SessionManager
             awful.spawn.easy_async("rofi -dmenu -markup -p 'Workspace' -lines 0 -location 2 | echo",
                 function(tag_name, err, reason, exit_code)
                     if exit_code == 0 then 
