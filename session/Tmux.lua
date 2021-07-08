@@ -1,6 +1,7 @@
 local awful = require("awful")
 local rx = require("RxLua.rx");
 local config = require("config.global");
+local debug = require("utils.debug");
 
 local Tmux = {};
 Tmux.__index = Tmux;
@@ -20,23 +21,23 @@ end
 
 
 function Tmux:newSession(path, tagName)
-    local terminal =
-    config.terminal
-    .." -o title=\""..tagName.."\""
-    .." --"
-    .." bash -c '"
-    .."tmux new-session -d"
-    .." -c $(FZF_DEFAULT_COMMAND=\"find ~/ -type d\" fzf)"
-    .." -s \""..tagName:gsub("\n", "").."\""
-    .."'"
-    ;
--- , { floating = true, tag = tag, placement = awful.placement.centered, height = 512, width = 768 }
+    local terminal = string.format("%s -o title=\"%s\" -- bash -c 'tmux new-session -d -c $(FZF_DEFAULT_COMMAND=\"find '%s' -type d\" fzf > /tmp/session && cat /tmp/session) -s \"%s\"'", config.terminal, tagName, path, tagName);
+    -- local terminal = string.format("%s -- bash -c 'tmux new-session -d -c $(FZF_DEFAULT_COMMAND=\"find '%s' -type d\" fzf > /tmp/session && cat /tmp/session) -s \"%s\"'", "tmux popup", path, tagName);
+-- , { floating = true, tag = tag, placement = awful.placement.centered, height = 512, width = 768 }, 
     awful.spawn.easy_async(
         terminal,
-        function(stdout, stderr, exitreason, exitcode)
-            if exitcode == 0 then
-                self._subjects.workdir:onNext(stdout);
-            end
+        function(_, _, _, _)
+            awful.spawn.easy_async_with_shell(
+                "cat /tmp/session",
+                function(stdout, stderr, _, exitcode)
+                    if exitcode == 0 then
+                        self._subjects.workdir:onNext(stdout);
+                    else
+                        -- TODO global error queue
+                        debug.print("error", stderr);
+                    end
+                end
+            );
         end
     );
 

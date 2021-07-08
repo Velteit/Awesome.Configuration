@@ -123,14 +123,14 @@ end)
 -- TODO move to buttons.init
 root.buttons(gears.table.join(
     awful.button({ }, 3, function () mymainmenu:toggle() end)
-))
+));
 -- TODO move to keys.init
 keys = gears.table.join(
    widgets.brightness.keys,
-   widgets.volume.keys, 
+   widgets.volume.keys,
    -- widgets.mpc.keys,
    keys
-)
+);
 root.keys(keys)
 
 -- TODO move to rules.init

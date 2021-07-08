@@ -2,10 +2,10 @@ local gears = require("gears")
 local awful = require("awful")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
 local config = require("config.global");
-local debug = require("utils.debug");
 local translate = require("widgets.translation");
 local SessionManager = require("session.SessionManager");
--- local mouse = require("awful.mouse");
+local Store = require("pass.Store");
+
 require("awful.hotkeys_popup.keys")
 
 
@@ -121,10 +121,7 @@ local keys = gears.table.join(
         function ()
             local tag = awful.screen.focused().selected_tag
             if not tag then return end;
-            -- TODO move to SessionManager
-            local command = config.terminal .. " tmux new-session -A -s '" .. (tag.name or "") .. "'"
-
-            awful.spawn(command)
+            SessionManager.singleton():runTerminal(tag);
         end,
         {description = "open a terminal", group = "launcher"}
     ),
@@ -141,6 +138,14 @@ local keys = gears.table.join(
         "a",
         function()
             SessionManager.singleton():addTag("/");
+        end,
+        {description = "new tag", group = "tags"}
+    ),
+    awful.key(
+        { config.modkey, "Shift" },
+        "s",
+        function()
+            SessionManager.singleton():saveCurrent();
         end,
         {description = "new tag", group = "tags"}
     ),
@@ -318,18 +323,36 @@ local keys = gears.table.join(
     awful.key(
         { config.modkey },
         "r",
-        function () 
+        function ()
             awful.spawn("rofi -show drun", { screen = awful.screen.focused().index });
-            -- awful.screen.focused().mypromptbox:run() 
+            -- awful.screen.focused().mypromptbox:run()
+        end,
+        {description = "run prompt", group = "launcher"}
+    ),
+    awful.key(
+        { config.modkey },
+        "c",
+        function ()
+            awful.spawn("rofi -modi \"clipboard:greenclip print\" -show clipboard -run-command '{cmd}'", { screen = awful.screen.focused().index });
+            -- awful.screen.focused().mypromptbox:run()
         end,
         {description = "run prompt", group = "launcher"}
     ),
     awful.key(
         { config.modkey },
         "p",
-        function () 
-            awful.spawn("autopass", { screen = awful.screen.focused().index });
-            -- awful.screen.focused().mypromptbox:run() 
+        function ()
+            initSub =
+                Store.singleton()
+                     :init()
+                     :subscribe(function(store)
+                         initSub:unsubscribe();
+                         chooseSub =
+                             store:choose()
+                                  :subscribe(function()
+                                      chooseSub:unsubscribe();
+                                  end);
+                     end);
         end,
         {description = "run prompt", group = "launcher"}
     )
@@ -368,7 +391,6 @@ for i = 1, 7 do
             end,
             {description = "toggle tag #" .. i, group = "tag"}
         ),
-        
         -- Move client to tag.
         awful.key(
             { config.modkey, "Shift" },

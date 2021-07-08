@@ -10,6 +10,7 @@ local freerdp = require("rules.freerdp");
 local web = require("rules.web");
 local pip = require("rules.pip");
 local term = require("rules.term");
+local skype = require("rules.skype");
 local gears = require("gears");
 
 local rules = {
@@ -25,6 +26,7 @@ local rules = {
     term,
     teams,
     freerdp,
+    skype
 };
 
 return rules;
