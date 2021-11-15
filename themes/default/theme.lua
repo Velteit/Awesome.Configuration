@@ -8,7 +8,7 @@ theme.wallpapers_path = "~/Wallpapers" --require("awful").util.getdir("home")
 
 -- {{{ Styles 
 -- theme.font      = "Terminus (TTF) 9"
-theme.font      = "JetBrains Mono 9"
+theme.font      = "JetBrains Mono 7"
 
 -- {{{ Colors
 theme.fg_normal     = "#c6c8d1"

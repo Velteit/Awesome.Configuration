@@ -107,6 +107,35 @@ local keys = gears.table.join(
         {description = "jump to urgent client", group = "client"}
     ),
     awful.key(
+        { config.modkey, "Control" },
+        "t",
+        function ()
+            local c = client.focus;
+
+            c.ontop = not c.ontop;
+        end,
+        {description = "toggle keep on top", group = "client"}
+    ),
+    awful.key(
+        { config.modkey },
+        "v",
+        function ()
+            local c = client.focus;
+            local height = 256;
+            local width = 512;
+
+            c.ontop = not c.ontop;
+            c.sticky = not c.sticky;
+            c:geometry({
+                width = width,
+                height = height,
+                x = 0,
+                y = awful.screen.focused().geometry.height - height - 5
+            })
+        end,
+        {description = "move to sticky corner", group = "video"}
+    ),
+    awful.key(
         { config.modkey, },
         "Tab",
         function ()
@@ -137,7 +166,7 @@ local keys = gears.table.join(
         { config.modkey, },
         "a",
         function()
-            SessionManager.singleton():addTag("/");
+            SessionManager.singleton():addTag("~/");
         end,
         {description = "new tag", group = "tags"}
     ),
@@ -235,7 +264,7 @@ local keys = gears.table.join(
     ),
     awful.key(
         { config.modkey, "Control" },
-        "r", 
+        "r",
         awesome.restart,
         {description = "reload awesome", group = "awesome"}
     ),
